@@ -16,7 +16,8 @@ def outputFastq(f2,phred33=False):
         qual=sp[9]
         if(phred33):
             qual=phred64ToStdqual(sp[9])
-        print "@%s:%s:%s:%s:%s#%s/%s[%s]\n%s\n+\n%s" % (sp[0],sp[2],sp[3],sp[4],sp[5],sp[6],sp[10],sp[8],qual)
+        seqString = sp[8].replace(".","N")
+        print "@%s:%s:%s:%s:%s\n%s\n+\n%s" % (sp[0],sp[2],sp[3],sp[4],sp[5],seqString,qual)
 
 usage = "usage: %prog [options] TarFileOrBustardDirectoryName"
 parser = OptionParser(usage=usage)
