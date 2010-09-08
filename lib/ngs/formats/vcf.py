@@ -1,6 +1,8 @@
 import gzip
 
 class vcfFile:
+    nextLine=None
+    
     def __init__(self,fname):
         self.fname=fname
         self.fh=None
@@ -8,12 +10,25 @@ class vcfFile:
             self.fh=gzip.open(fname,'r')
         else:
             self.fh=open(fname,'r')
+        self.header=[]
+        line=self.fh.readline()
+        while(line.startswith("#")):
+            self.header.add(line.strip())
+            line=self.fh.readline()
+        self.nextline=line
+
+    def parse(self):
+        if(self.nextLine is not None):
+            yield vcfRecord(self.nextLine)
+            self.nextLine=self.fh.readline().strip()
 
 class vcfRecord:
     def __init__(self,line):
         parts=line.split()
         self.chromosome=parts[0]
         self.position=parts[1]
+        self.start=self.position-1
+        self.end=self.position
         self.name=parts[2]
         self.ref=parts[3]
         self.alt=parts[4]

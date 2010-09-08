@@ -12,11 +12,16 @@ import os
 import unittest
 
 class Range:
+    """Encapsulates a range on a line, as in a range on a chromosome.
+
+    Note that these are 0-based, half-open ranges."""
     def __init__(self,rbeg,rend):
         self.rbeg=rbeg
         self.rend=rend
         
 class Region(Range):
+    """Inherited from Range, a Region represents a genomic region and
+    includes the chromosome."""
     def __init__(self,chromosome,rbeg,rend):
         Range.__init__(self,rbeg,rend)
         self.chromosome=chromosome
@@ -24,6 +29,7 @@ class Region(Range):
 class RegionList(dict):
     
     def add(self,region):
+        """Add a new Region-like object to the RegionList"""
         try:
             self[region.chromosome].add(region)
         except KeyError:
@@ -32,14 +38,17 @@ class RegionList(dict):
             self[region.chromosome]=binlist
     
     def overlapCount(self,region):
+        """Find the number of regions that overlap the given Region-like object"""
         try:
             return(self[region.chromosome].overlapCount(region))
         except KeyError:
             return(0)
 
 class BinList(dict):
-        
+    """Designed to hold ranges and supports very fast range queries on a single
+    linear range like a chromosome."""
     def add(self,range):
+        """Add a new range-like object to the BinList"""
         newbin=self._reg2bin(range.rbeg,range.rend)
         if(self.has_key(newbin)):
             self[newbin].append(range)
