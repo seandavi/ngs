@@ -31,9 +31,10 @@ class vcfFile:
         self.is_open=True
         self.header=[]
         line=self.fh.readline()
-        while(line.startswith("#")):
+        while(not (line.startswith("#CHROM"))):
             self.header.append(line.strip())
             line=self.fh.readline()
+        self.header.append(line.strip())
         tableHeaders=self.header[-1]
         self.sampleNames=tableHeaders.split("\t")[9:]
 
@@ -46,10 +47,9 @@ class vcfRecord:
         self.rend=self.position
         self.name=parts[2]
         self.ref=parts[3]
-        self.alt=parts[4]
+        self.alt=parts[4].split(",")
         self.qual=float(parts[5])
         self.filt=parts[6]
-        self.info=parts[7]
-        self.form=parts[8]
-        self.samples=parts[9:]
+        self.info=parts[7].split(";")
+        self.samples=[dict(zip(parts[8].split(":"),y.split(":"))) for y in parts[9:]]
 
