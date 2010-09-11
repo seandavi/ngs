@@ -57,8 +57,9 @@ class vcfFile:
             headerInfo=[]
             # make a dict of the header information for each section.
             for line in lines:
-                headerInfo.append(dict([member.split("=",1) \
-                                        for member in line.split(",",headerSectionChoices[section])]))
+                tagdict=dict([member.split("=",1) \
+                              for member in line.split(",",headerSectionChoices[section])])
+                headerInfo.append(tagdict)
             headerstuff[section]=dict([(x['ID'],x) for x in headerInfo])
         return(headerstuff)
 
