@@ -7,7 +7,7 @@ The Variant Call Format (VCF) is described `here <http://1000genomes.org/wiki/do
 __docformat__ = 'restructuredtext'
 
 import gzip
-
+import re
 
 class vcfFile:
     
@@ -37,6 +37,20 @@ class vcfFile:
         self.header.append(line.strip())
         tableHeaders=self.header[-1]
         self.sampleNames=tableHeaders.split("\t")[9:]
+        self.header=self._parseHeader(self.header)
+
+    def _parseHeader(self,header):
+        headerstuff={}
+        infolines=[re.sub("##INFO=<","",line) for line in header \
+                   if line.startswith("##INFO")]
+        infolines=[re.sub(">$","",line) for line in infolines]
+        headerInfo=[]
+        for line in infolines:
+            print line
+            headerInfo.append(dict([member.split("=",1) \
+                               for member in line.split(",",3)]))
+        headerstuff['INFO']=headerInfo
+        return(headerstuff)
 
 class vcfRecord:
     def __init__(self,line):
@@ -46,9 +60,9 @@ class vcfRecord:
         self.rbeg=self.position-1
         self.rend=self.position
         self.name=parts[2]
-        self.ref=parts[3]
-        self.alt=parts[4].split(",")
-        self.qual=float(parts[5])
+        self.refAllele=parts[3]
+        self.altAlleles=parts[4].split(",")
+        self.quality=float(parts[5])
         self.filt=parts[6]
         self.info=parts[7].split(";")
         self.samples=[dict(zip(parts[8].split(":"),y.split(":"))) for y in parts[9:]]
