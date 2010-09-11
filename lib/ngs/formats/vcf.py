@@ -40,16 +40,26 @@ class vcfFile:
         self.header=self._parseHeader(self.header)
 
     def _parseHeader(self,header):
+        # This little helper parses the header lines with
+        # tags and values into a dict of dicts.
+        
+        # This dict contains the header line section names
+        # and the number of splits of the data within the < >
+        # parts
+        headerSectionChoices={"INFO":3,"FORMAT":3,"FILTER":1}
         headerstuff={}
-        infolines=[re.sub("##INFO=<","",line) for line in header \
-                   if line.startswith("##INFO")]
-        infolines=[re.sub(">$","",line) for line in infolines]
-        headerInfo=[]
-        for line in infolines:
-            print line
-            headerInfo.append(dict([member.split("=",1) \
-                               for member in line.split(",",3)]))
-        headerstuff['INFO']=headerInfo
+        for section in headerSectionChoices.keys():
+            resub="##%s=<" % section
+            # Grab the appropriate lines for each section
+            lines=[re.sub(resub,"",line) for line in header \
+                   if line.startswith("##%s" % section)]
+            lines=[re.sub(">$","",line) for line in lines]
+            headerInfo=[]
+            # make a dict of the header information for each section.
+            for line in lines:
+                headerInfo.append(dict([member.split("=",1) \
+                                        for member in line.split(",",headerSectionChoices[section])]))
+            headerstuff[section]=dict([(x['ID'],x) for x in headerInfo])
         return(headerstuff)
 
 class vcfRecord:
