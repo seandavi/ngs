@@ -9,6 +9,16 @@ __docformat__ = 'restructuredtext'
 import gzip
 import re
 
+class vcfHeader(dict):
+    """
+    Contains the header tag lines from a VCF file
+
+    Currently, this class simply stores three dicts, INFO, FORMAT, and FILTER.
+    Each of these dicts contains a dict of tags and potentially many key:value
+    pairs.
+    """
+    pass
+
 class vcfFile:
     
     def __init__(self,fname):
@@ -47,7 +57,7 @@ class vcfFile:
         # and the number of splits of the data within the < >
         # parts
         headerSectionChoices={"INFO":3,"FORMAT":3,"FILTER":1}
-        headerstuff={}
+        headerstuff=vcfHeader()
         for section in headerSectionChoices.keys():
             resub="##%s=<" % section
             # Grab the appropriate lines for each section
