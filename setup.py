@@ -4,5 +4,5 @@ setup(
     version="0.1",
     packages=find_packages('source'),
     package_dir = {'':'source'},
-    scripts = ['scripts/overlapVCF.py','scripts/qseq2fastq.py'],
+    scripts = ['scripts/overlapVCF.py','scripts/qseq2fastq.py','scripts/gtf2picardIntervalList.py']
     )
