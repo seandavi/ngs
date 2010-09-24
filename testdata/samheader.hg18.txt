@@ -1,0 +1,30 @@
+@HD     VN:1.0  GO:none SO:coordinate
+@SQ     SN:chr10        LN:135374737    AS:hg18
+@SQ     SN:chr11        LN:134452384    AS:hg18
+@SQ     SN:chr12        LN:132349534    AS:hg18
+@SQ     SN:chr13        LN:114142980    AS:hg18
+@SQ     SN:chr14        LN:106368585    AS:hg18
+@SQ     SN:chr15        LN:100338915    AS:hg18
+@SQ     SN:chr16        LN:88827254     AS:hg18
+@SQ     SN:chr17        LN:78774742     AS:hg18
+@SQ     SN:chr18        LN:76117153     AS:hg18
+@SQ     SN:chr19        LN:63811651     AS:hg18
+@SQ     SN:chr1 LN:247249719    AS:hg18
+@SQ     SN:chr20        LN:62435964     AS:hg18
+@SQ     SN:chr21        LN:46944323     AS:hg18
+@SQ     SN:chr22        LN:49691432     AS:hg18
+@SQ     SN:chr2 LN:242951149    AS:hg18
+@SQ     SN:chr3 LN:199501827    AS:hg18
+@SQ     SN:chr4 LN:191273063    AS:hg18
+@SQ     SN:chr5 LN:180857866    AS:hg18
+@SQ     SN:chr6 LN:170899992    AS:hg18
+@SQ     SN:chr7 LN:158821424    AS:hg18
+@SQ     SN:chr8 LN:146274826    AS:hg18
+@SQ     SN:chr9 LN:140273252    AS:hg18
+@SQ     SN:chrM LN:16571        AS:hg18
+@SQ     SN:chrX LN:154913754    AS:hg18
+@SQ     SN:chrY LN:57772954     AS:hg18
+@RG     ID:6_61PKNAAXX.143_ON_CTRLR-2010-07-06  PL:Illumina     SM:6_61PKNAAXX.143_ON_CTRLR-2010-07-06
+@PG     ID:GATK TableRecalibration      VN:1.0.3471     CL:Covariates=[ReadGroupCovariate, QualityScoreCovariate, CycleCovariate, DinucCovariate], default_read_group=null, default_platform=ILLUMINA, force_read_group=null, force_platform=null, solid_recal_mode=SET_Q_ZERO, window_size_nqs=5, homopolymer_nback=7, exception_if_no_tile=false, ignore_nocall_colorspace=false, pQ=5, maxQ=40, smoothing=1
+@PG     ID:novoalign    VN:V2.07.01     CL:novoalign -f 6_1_61PKNAAXX.143_ON_CTRLR-2010-07-06.fastq.gz 6_2_61PKNAAXX.143_ON_CTRLR-2010-07-06.fastq.gz -a -o SAM @RG\tID:6_61PKNAAXX.143_ON_CTRLR-2010-07-06\tSM:6_61PKNAAXX.143_ON_CTRLR-2010-07-06\tPL:Illumina -c 8 -d /home/public/novoalign/hg18.index
+
