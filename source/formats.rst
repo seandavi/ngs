@@ -16,28 +16,16 @@ Variant Call Format
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: ngs.formats.vcf.vcfFile
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: ngs.formats.vcf.VCFRecord
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Illumina qseq
 -------------
 .. automodule:: ngs.formats.qseq
+
+qseq Records
+^^^^^^^^^^^^
+.. autoclass:: ngs.formats.qseq.qseqRecord
    :members:
    :undoc-members:
    :show-inheritance:
-
-.. autoclass:: ngs.formats.qseq.qseqFile
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 qseq Files
 ^^^^^^^^^^
@@ -45,4 +33,5 @@ qseq Files
    :members:
    :undoc-members:
    :show-inheritance:
+
 

@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
    
    formats.rst
+   todo.rst
 
 Indices and tables
 ==================

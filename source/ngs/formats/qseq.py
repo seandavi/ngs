@@ -10,7 +10,9 @@ def phred64ToStdqual(qualin):
     """
     Convert phred64-encoded quality string to phred33-encoding
 
-    Takes a quality string and returns a new quality string, properly encoded
+    :param qualin: The phred64-encoded string
+    :type qualin: string
+    :rtype: string
     """
     return(''.join([chr(ord(x)-31) for x in qualin]))
 
@@ -18,7 +20,8 @@ class qseqRecord:
     """Encapsulate a qseqRecord.
 
     A qseq record is usually phred-64 encoded, so it may be necessary
-    to convert to phred-33 for downstream use.
+    to convert to phred-33 for downstream use.  To create a new record,
+    pass in the line from the qseq file.
 
     The fields are encoded like this::
     
@@ -54,18 +57,51 @@ class qseqRecord:
         self.filter=bool(fields[10])
 
     def __str__(self):
-        """Return a properly-formated qseq line"""
+        """
+        Return a properly-formated qseq line
+        """
         return "%s\t%s\t%d\t%d\t%d\t%d\t%d\t%d\t%s\t%s\t%d" % (self.machine,self.run,self.lane,self.tile,
                           self.xcoord,self.ycoord,self.indexnum,
                           self.read,self.sequence,self.quality,
                           self.filter)
+    def asFastqString(self,phred33=True):
+        """
+        Return the qseq record as a fastq string
+
+        :param phred33: Convert to phred33-scaled qualities before returning
+        :type phred33: Boolean
+        :rtype: string representing fastq record
+
+        .. todo::
+
+            Should return a fastq record at some point
+        """
+        qual=self.quality
+        if(phred33):
+            qual=phred64ToStdqual(sp[9])
+        return("@%s:%s:%s:%s:%s\n%s\n+\n%s\n" % (self.machine,
+                                                 self.run,
+                                                 self.lane,
+                                                 self.tile,
+                                                 self.xcoord,
+                                                 self.ycoord,
+                                                 self.sequence,
+                                                 qual))
 
 class qseqFile:
     """
-    Represents a qseq file.
+    Create a new qseqFile
+
+    Takes either a fname or a filehandle.  If filehandle is
+    given, it is used directly.  Otherwise, the filename
+    is parsed and if it ends in .gz, the file is opened as a
+    gzipped file.
+
+    :param fname: A filename, may end in .gz in which case, assumed to be a gzipped file
+    :param fh: A file handle of an already opened file
+    :rtype: An object of type :class:`qseqFile`
 
     Usage is along the lines of::
-
     
         x = qseq.qseqFile(fname='../../../testdata/s_1_1_0005_qseq.txt')
         for qseqrecord in x.parse():
@@ -79,6 +115,11 @@ class qseqFile:
         given, it is used directly.  Otherwise, the filename
         is parsed and if it ends in .gz, the file is opened as a
         gzipped file.
+
+        :param fname: A filename, may end in .gz in which case, assumed to be
+        a gzipped file
+        :param fh: A file handle of an already opened file
+        :rtype: An object of type :class:`qseqFile`
         """
         if(fh is not None):
             self.fh=fh

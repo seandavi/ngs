@@ -1,7 +1,7 @@
 """
 A module for opening and parsing a VCF format file and encapsulating VCF records
 
-The Variant Call Format (VCF) is described `here <http://1000genomes.org/wiki/doku.php?id=1000_genomes:analysis:vcf4.0>`
+The Variant Call Format (VCF) is described `here <http://1000genomes.org/wiki/doku.php?id=1000_genomes:analysis:vcf4.0>`_
 """
 
 __docformat__ = 'restructuredtext'
