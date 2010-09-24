@@ -6,10 +6,11 @@ class SolexaDB:
     Little helper class for working with the solexa database.
 
     >>> import ngs.solexadb.model
-    >>> sdb = ngs.solexadb.model.SolexaDB("mysql://USER:PASSWORD@amnesia.nci.nih.gov/solexa")
+    >>> sdb = ngs.solexadb.model.SolexaDB("mysql://sdavis:mic2222@localhost/solexa")
     >>> sm = sdb.getTable('solexa_matrix')
     >>> session = sdb.getSession()
-    >>> session.query(sm.c.Source_Name).filter(sm.c.Study_ID==10).slice(1,5).all()
+    >>> session.query(sm.c.Source_Name).filter(sm.c.Study_ID==7).slice(1,10).count()
+    9L
 
     """
     
