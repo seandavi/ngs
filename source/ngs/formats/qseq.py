@@ -1,21 +1,17 @@
 #!/usr/bin/env python
 # encoding: utf-8
-"""
-qseq.py
 
-Created by Sean Davis on 2010-06-08.
-Copyright (c) 2010 __MyCompanyName__. All rights reserved.
-"""
 
 import sys
 import os
 import unittest
 
 def phred64ToStdqual(qualin):
-    """Convert phred64-encoded quality string to phred33-encoding
+    """
+    Convert phred64-encoded quality string to phred33-encoding
 
-    Takes a quality string and returns a new quality string,
-    properly encoded"""
+    Takes a quality string and returns a new quality string, properly encoded
+    """
     return(''.join([chr(ord(x)-31) for x in qualin]))
 
 class qseqRecord:
@@ -24,7 +20,8 @@ class qseqRecord:
     A qseq record is usually phred-64 encoded, so it may be necessary
     to convert to phred-33 for downstream use.
 
-    The fields are encoded like this:
+    The fields are encoded like this::
+    
         fields=line.strip().split("\t")
         self.machine=fields[0]
         self.run=fields[1]
@@ -37,7 +34,8 @@ class qseqRecord:
         self.sequence=fields[8]
         self.quality=fields[9]
         self.filter=bool(fields[10])
-        """
+        
+    """
     
     def __init__(self,line):
         """Create a new qseqRecord from a single string representing
@@ -66,11 +64,12 @@ class qseqFile:
     """
     Represents a qseq file.
 
-    Usage is along the lines of:
+    Usage is along the lines of::
 
-    x = qseq.qseqFile(fname='../../../testdata/s_1_1_0005_qseq.txt')
-    for qseqrecord in x.parse():
-        print qseqrecord
+    
+        x = qseq.qseqFile(fname='../../../testdata/s_1_1_0005_qseq.txt')
+        for qseqrecord in x.parse():
+            print qseqrecord
     """
     def __init__(self,fname=None,fh=None):
         """
