@@ -62,7 +62,7 @@ class vcfFile:
         self.open()
 
     def parse(self):
-        """Return a generator that yields one :class:`ngs.formats.vcf.VCFRecord` at a time"""
+        """Return a generator that yields one :class:`VCFRecord` at a time"""
         for line in self.fh:
             (yield string2VCF(line.strip(),self.header))
 
@@ -244,30 +244,6 @@ def string2VCF(line, header=None, decodeAll = True):
     # we reach this point for empty files    
     #print 'header is', header
     return header, columnNames, []
-
-def quickCountRecords(lines):
-    counter = 0
-    for line in lines:
-        if line[0] != "#":
-            counter += 1
-    return counter
-
-
-def lines2VCF(lines, extendedOutput = False, decodeAll = True, header=None, columnNames = None):
-    if header == None:
-        header, columnNames, lines = readVCFHeader(lines)
-    counter = 0
-
-    for line in lines:
-        if line[0] != "#":
-            counter += 1
-            vcf = string2VCF(line, header=columnNames, decodeAll = decodeAll)
-            if vcf <> None:
-                if extendedOutput:
-                    yield header, vcf, counter
-                else:
-                    yield vcf
-    raise StopIteration()
 
 def formatVCF(header, records):
     #print records
