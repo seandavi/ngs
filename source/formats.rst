@@ -11,7 +11,17 @@ File format utilities and parsers
 
 Variant Call Format
 -------------------
-.. automodule:: ngs.formats.vcfReader
+.. automodule:: ngs.formats.vcf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: ngs.formats.vcf.vcfFile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: ngs.formats.vcf.VCFRecord
    :members:
    :undoc-members:
    :show-inheritance:
