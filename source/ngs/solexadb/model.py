@@ -5,6 +5,8 @@ class SolexaDB:
     """
     Little helper class for working with the solexa database.
 
+    The class is built using `sqlalchemy <http://www.sqlalchemy.org/>`_ so reading the `docs <http://www.sqlalchemy.org/docs/>`_ is likely to be helpful.
+
     >>> import ngs.solexadb.model
     >>> sdb = ngs.solexadb.model.SolexaDB("mysql://sdavis:mic2222@localhost/solexa")
     >>> sm = sdb.getTable('solexa_matrix')
