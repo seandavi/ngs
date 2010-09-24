@@ -4,8 +4,10 @@ import logging
 import sys
 import ngs.formats.gtf
 
-logging.basicConfig(level=logging.INFO)
+HEADER_INCLUDE_TAGS = ('@SQ','@HD')
 
+# set up logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('gtf2picardIntervalList')
 
 usage ="""usage: %prog [options] headerFile gtfFile
@@ -14,7 +16,6 @@ Takes a header that looks like a sam header (the @SQ fields only) and a gtf
 file as arguments and generates a picard-format interval file.  See
 http://www.broadinstitute.org/gsa/wiki/index.php/Input_files_for_the_GATK
 for details."""
-
 
 def main():
     parser = optparse.OptionParser(usage=usage)
@@ -27,7 +28,7 @@ def main():
     logger.info("Program arguments: %s" % (str(opts) + str(args)))
     outfile = sys.stdout
     for line in open(args[0],'r'):
-        if(line.startswith('@SQ')):
+        if(line.startswith(HEADER_INCLUDE_TAGS)):
             outfile.write(line)
     features = opts.features
     featurelen = len(features)
