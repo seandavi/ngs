@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-regions.py
+regions.pyx
 
 Created by Sean Davis on 2010-08-16.
 Copyright (c) 2010 __US Government__. All rights reserved.
@@ -11,7 +11,7 @@ import sys
 import os
 import unittest
 
-class Range:
+def class Range:
     """Encapsulates a range on a line, as in a range on a chromosome.
 
     Note that these are 0-based, half-open ranges."""
