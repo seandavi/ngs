@@ -11,7 +11,7 @@ import sys
 import os
 import unittest
 
-def class Range:
+class Range:
     """Encapsulates a range on a line, as in a range on a chromosome.
 
     Note that these are 0-based, half-open ranges."""
