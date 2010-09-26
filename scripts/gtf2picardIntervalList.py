@@ -30,7 +30,9 @@ def main():
     for line in open(args[0],'r'):
         if(line.startswith(HEADER_INCLUDE_TAGS)):
             outfile.write(line)
-    features = opts.features
+    features = []
+    if(opts.features is not None):
+        features=opts.features
     featurelen = len(features)
     writtenFeatures = 0
     readFeatures = 0
@@ -38,10 +40,15 @@ def main():
         readFeatures+=1
         if(((featurelen>0) & (gtfrecord.feature in features)) | (featurelen==0)):
             writtenFeatures+=1
+            rbeg=gtfrecord.rbeg
+            rend=gtfrecord.rend
+            if(gtfrecord.rbeg > gtfrecord.rend):
+                rbeg=gtfrecord.rend
+                rend=gtfrecord.rbeg
             outfile.write("%s\t%d\t%d\t%s\tTarget_%d\n" % (
                 gtfrecord.chromosome,
-                gtfrecord.rbeg,
-                gtfrecord.rend,
+                rbeg,
+                rend,
                 gtfrecord.strand,
                 readFeatures))
     outfile.close()
