@@ -6,3 +6,4 @@ build
 NGS.egg-info
 *.c
 *~
+*.so
