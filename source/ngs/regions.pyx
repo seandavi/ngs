@@ -73,7 +73,7 @@ class BinList(dict):
         return(retcount)
         
     def _reg2bin(self, rbeg, rend):
-      	rend=rend-1
+        rend=rend-1
         if (rbeg>>14 == rend>>14): return ((1<<15)-1)/7 + (rbeg>>14)
         if (rbeg>>17 == rend>>17): return ((1<<12)-1)/7 + (rbeg>>17)
         if (rbeg>>20 == rend>>20): return ((1<<9)-1)/7 + (rbeg>>20)
@@ -97,7 +97,7 @@ class BinList(dict):
 class BinListTests(unittest.TestCase):
     def setUp(self):
         self.binlist = BinList()
-	
+        
     def test_reg2bin(self):
         self.assertEqual(self.binlist._reg2bin(100,2000),4681)
         
@@ -124,4 +124,4 @@ class BinListTests(unittest.TestCase):
         
 
 if __name__ == '__main__':
-	unittest.main()
+        unittest.main()
