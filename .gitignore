@@ -7,3 +7,5 @@ NGS.egg-info
 *.c
 *~
 *.so
+
+*#
