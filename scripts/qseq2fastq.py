@@ -6,6 +6,7 @@ import sys
 import os
 import re
 import tarfile
+import ngs.formats.qseq
 
 def phred64ToStdqual(qualin):
     return(''.join([chr(ord(x)-31) for x in qualin]))
@@ -15,7 +16,7 @@ def outputFastq(f2,phred33=False):
         sp = line.strip().split("\t")
         qual=sp[9]
         if(phred33):
-            qual=phred64ToStdqual(sp[9])
+            qual=ngs.formats.qseq.phred64ToStdqual(sp[9])
         seqString = sp[8].replace(".","N")
         print "@%s:%s:%s:%s:%s\n%s\n+\n%s" % (sp[0],sp[2],sp[3],sp[4],sp[5],seqString,qual)
 
