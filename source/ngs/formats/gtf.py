@@ -1,5 +1,6 @@
 import ngs.regions
 import gzip
+import shlex
 
 class GTFRecord(ngs.regions.Region):
     """
@@ -36,7 +37,22 @@ class GTFRecord(ngs.regions.Region):
         except:
             pass
         self.rest=parts[8]
-
+        self._parseAnnotationCol(parts[8])
+        
+    def _parseAnnotationCol(self,coltext):
+        """
+        Parse the last GTF column to pull out gene and transcript IDs
+        """
+        for possiblePair in coltext.split(";"):
+            splitVals = shlex.split(possiblePair)
+            if(len(splitVals)<>2):
+                continue
+            if(splitVals[0]=="gene_id"):
+                self.gene=splitVals[1]
+            if(splitVals[0]=="transcript_id"):
+                self.transcript=splitVals[1]
+            
+        
     def __str__(self):
         return("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t" % (
             self.chromosome,
