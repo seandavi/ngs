@@ -10,6 +10,10 @@ class GTFRecord(ngs.regions.Region):
     Structure is as GFF, so the fields are:
     <chromosome> <source> <feature> <rbeg> <rend> <score> <strand> <frame> [attributes] [comments]
 
+    .. warning::
+
+        The coordinates in a GTF file are 1-based.  This module converts the starts to 0-based to match the more usual convention.
+
     Here is a simple example with 3 translated exons. Order of rows is not important.::
 
         381 Twinscan  CDS          380   401   .   +   0  gene_id "001"; transcript_id "001.1";
@@ -24,7 +28,7 @@ class GTFRecord(ngs.regions.Region):
     def __init__(self,line):
         parts = line.strip().split("\t")
         ngs.regions.Region.__init__(self,parts[0],
-                                    int(parts[3]),
+                                    int(parts[3])-1,
                                     int(parts[4]))
         self.source=parts[1]
         self.feature=parts[2]
