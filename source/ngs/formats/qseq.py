@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-
+import string
 import sys
 import os
 import unittest
+
+_trans = string.maketrans(''.join(chr(i) for i in range(31, 127)), ''.join(chr(i) for i in range(127 - 31)))
 
 def phred64ToStdqual(qualin):
     """
@@ -14,7 +16,7 @@ def phred64ToStdqual(qualin):
     :type qualin: string
     :rtype: string
     """
-    return(''.join([chr(ord(x)-31) for x in qualin]))
+    return qualin.translate(_trans)
 
 class qseqRecord:
     """Encapsulate a qseqRecord.
