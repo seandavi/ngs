@@ -14,6 +14,13 @@ Variant Call Format
    :undoc-members:
    :show-inheritance:
 
+FastQ
+-----
+.. automodule:: ngs.formats.fastq
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Illumina qseq
 -------------
 .. automodule:: ngs.formats.qseq

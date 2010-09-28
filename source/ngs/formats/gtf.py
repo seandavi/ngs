@@ -1,5 +1,6 @@
 import ngs.regions
 import gzip
+import shlex
 
 class GTFRecord(ngs.regions.Region):
     """
@@ -8,6 +9,10 @@ class GTFRecord(ngs.regions.Region):
     GTF stands for Gene transfer format. It borrows from GFF, but has additional structure that warrants a separate definition and format name.
     Structure is as GFF, so the fields are:
     <chromosome> <source> <feature> <rbeg> <rend> <score> <strand> <frame> [attributes] [comments]
+
+    .. warning::
+
+        The coordinates in a GTF file are 1-based.  This module converts the starts to 0-based to match the more usual convention.
 
     Here is a simple example with 3 translated exons. Order of rows is not important.::
 
@@ -23,7 +28,7 @@ class GTFRecord(ngs.regions.Region):
     def __init__(self,line):
         parts = line.strip().split("\t")
         ngs.regions.Region.__init__(self,parts[0],
-                                    int(parts[3]),
+                                    int(parts[3])-1,
                                     int(parts[4]))
         self.source=parts[1]
         self.feature=parts[2]
@@ -36,7 +41,22 @@ class GTFRecord(ngs.regions.Region):
         except:
             pass
         self.rest=parts[8]
-
+        self._parseAnnotationCol(parts[8])
+        
+    def _parseAnnotationCol(self,coltext):
+        """
+        Parse the last GTF column to pull out gene and transcript IDs
+        """
+        for possiblePair in coltext.split(";"):
+            splitVals = shlex.split(possiblePair)
+            if(len(splitVals)<>2):
+                continue
+            if(splitVals[0]=="gene_id"):
+                self.gene=splitVals[1]
+            if(splitVals[0]=="transcript_id"):
+                self.transcript=splitVals[1]
+            
+        
     def __str__(self):
         return("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t" % (
             self.chromosome,
