@@ -1,22 +1,38 @@
 
 class ParseFastQ(object):
     """Returns a read-by-read fastQ parser analogous to file.readline()
-
-        Exmpl: parser.next()
-        -OR-
-        It's an iterator so you can do:
-        for rec in parser:
-            ... do something with rec ...
-
-        rec is tuple: (seqHeader,seqStr,qualHeader,qualStr)
     
+    :param filePath: path or filename of fastq file
+    :type filePath: string
+    :param headerSymbols: list of length 2 specifying the header line start symbols; default ['@','+']
+    :type headerSymbols: list of strings
+    :rtype: tuple (seqHeader,seqStr,qualHeader,qualStr)
+
+    Exmpl: parser.next()
+    -OR-
+    It's an iterator so you can do:
+    for rec in parser:
+    ... do something with rec ...
+
+
+    .. todo::
+
+        This should return fastq objects at some point
     """
     
     def __init__(self,filePath,headerSymbols=['@','+']):
         """Returns a read-by-read fastQ parser analogous to file.readline().
 
         :param filePath: path or filename of fastq file
-        :param headerSymbols: list of length 2 specifying the header line start symbols; default ['@','+']
+        :param headerSymbols: list of length 2 specifying the header line start symbols; default ['@','+']::
+        
+            Exmpl: parser.next()
+            -OR-
+            It's an iterator so you can do:
+            for rec in parser:
+            ... do something with rec ...
+    
+        rec is a tuple: (seqHeader,seqStr,qualHeader,qualStr)
         """
         self._file = open(filePath, 'rU')
         self._currentLineNumber = 0
