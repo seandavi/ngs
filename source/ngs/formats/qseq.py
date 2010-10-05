@@ -5,8 +5,24 @@ import string
 import sys
 import os
 import unittest
+import gzip
+import itertools
+from math import log
 
+## fast conversion from phred-64 to phred-33
 _trans = string.maketrans(''.join(chr(i) for i in range(31, 127)), ''.join(chr(i) for i in range(127 - 31)))
+
+## This is for converting pre-1.3 qualities to std qualities
+## taken from fq_all2std.pl
+conv_table={}
+for x in range(-64,65):
+    conv_table[x+64] = int(33 + 10*log(1+10**(x/10.0))/log(10)+.499)
+
+def generalFileOpen(fname,mode='r'):
+    if(fname.endswith("gz")):
+        return(gzip.open(fname,mode))
+    else:
+        return(open(fname,mode))
 
 def phred64ToStdqual(qualin):
     """
@@ -126,10 +142,7 @@ class qseqFile:
         if(fh is not None):
             self.fh=fh
             return
-        if(fname.endswith("gz")):
-            self.fh=gzip.open(fname,"r")
-        else:
-            self.fh=open(fname,'r')
+        self.fh=generalFileOpen(fname,"r")
     
     def parse(self):
         """
@@ -138,4 +151,48 @@ class qseqFile:
         """
         for line in self.fh:
             yield(qseqRecord(line))
+
+class seqprbFile:
+    """
+    Encapsulates a pair of files, the _seq.txt and _prb.txt files from Illumina
+
+    usage is along the lines of:
+
+    >>> import ngs.formats.qseq
+    >>> spfile = ngs.formats.qseq.seqprbFile("s_1_0033_seq.txt","s_1_0033_prb.txt")
+    >>> for i in spfile.parse():
+    >>>     print i
+
+    This will return a phred-33 quality fastq string
+    """
+    def __init__(self,seqfile,prbfile):
+        self._seqfile=generalFileOpen(seqfile,'r')
+        self._prbfile=generalFileOpen(prbfile,'r')
+
+    def parse(self,split):
+        """
+        Parse a seq/prb file pair into fastq chunks.
+
+        :param split: If the seq/prb pair represents a paired-end read, return a tuple of two fastq strings by splitting the read and quality at split.
+        :type split: integer
+        :rtype: either a string or tuple of strings (if split split is supplied) representing fastq records
+        """
+        for seq,prb in itertools.izip(self._seqfile,self._prbfile):
+            seqsplit = seq.strip().split()
+            seqname = ":".join(seqsplit[0:4])
+            seqseq  = seqsplit[4].replace('.','N')
+            prbsplit = [int(x) for x in prb.strip().split()]
+            qual = []
+            for j in xrange(0,len(prbsplit),4):
+                qual.append(chr(conv_table[max(prbsplit[j:(j+4)])+64]))
+            qualstring = "".join(qual)
+            if(split==None):
+                yield("@%s\n%s\n+%s\n%s" % (seqname,seqseq,seqname,"".join(qual)))
+            else:
+                yield(("@%s\n%s\n+%s\n%s" %
+                      (seqname,seqseq[0:(split+1)],
+                       seqname,qualstring[0:(split+1)]),
+                       "@%s\n%s\n+%s\n%s" %
+                      (seqname,seqseq[(split+1):],
+                       seqname,qualstring[(split+1):])))
 
