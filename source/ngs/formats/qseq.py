@@ -96,14 +96,14 @@ class qseqRecord:
         """
         qual=self.quality
         if(phred33):
-            qual=phred64ToStdqual(sp[9])
-        return("@%s:%s:%s:%s:%s\n%s\n+\n%s\n" % (self.machine,
+            qual=phred64ToStdqual(self.quality)
+        return("@%s:%s:%d:%d:%d:%d\n%s\n+\n%s\n" % (self.machine,
                                                  self.run,
                                                  self.lane,
                                                  self.tile,
                                                  self.xcoord,
                                                  self.ycoord,
-                                                 self.sequence,
+                                                 self.sequence.replace(".","N"),
                                                  qual))
 
 class qseqFile:
@@ -159,15 +159,28 @@ class seqprbFile:
     usage is along the lines of:
 
     >>> import ngs.formats.qseq
-    >>> spfile = ngs.formats.qseq.seqprbFile("s_1_0033_seq.txt","s_1_0033_prb.txt")
+    >>> spfile = ngs.formats.qseq.seqprbFile(filenames=("s_1_0033_seq.txt","s_1_0033_prb.txt"))
     >>> for i in spfile.parse():
     >>>     print i
 
     This will return a phred-33 quality fastq string
     """
-    def __init__(self,seqfile,prbfile):
-        self._seqfile=generalFileOpen(seqfile,'r')
-        self._prbfile=generalFileOpen(prbfile,'r')
+    def __init__(self,filenames=None,fhs=None):
+        # takes a tuple of either two filenames or two file handles.
+        # The first is the seq file and the second is prb.
+        if(fhs is not None):
+            ### Even the files within the tarfile might be gzipped
+            if(fhs[0].name.endswith(".gz")):
+                self._seqfile=gzip.GzipFile(mode='r',fileobj=fhs[0])
+            else:
+                self._seqfile=fhs[0]
+            if(fhs[2].name.endswith(".gz")):
+                self._prbfile=gzip.GzipFile(mode='r',fileobj=fhs[1])
+            else:
+                self._prbfile=fhs[1]
+        else:
+            self._seqfile=generalFileOpen(filenames[0],'r')
+            self._prbfile=generalFileOpen(filenames[1],'r')
 
     def parse(self,split):
         """

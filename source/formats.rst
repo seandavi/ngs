@@ -25,6 +25,13 @@ Illumina qseq
 -------------
 .. automodule:: ngs.formats.qseq
 
+seq/prb File
+^^^^^^^^^^^^
+.. autoclass:: ngs.formats.qseq.seqprbFile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qseq Records
 ^^^^^^^^^^^^
 .. autoclass:: ngs.formats.qseq.qseqRecord
