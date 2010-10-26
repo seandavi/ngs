@@ -1,3 +1,5 @@
+from ngs.formats.qseq import generalFileOpen
+
 
 class ParseFastQ(object):
     """Returns a read-by-read fastQ parser analogous to file.readline()
@@ -34,7 +36,7 @@ class ParseFastQ(object):
     
         rec is a tuple: (seqHeader,seqStr,qualHeader,qualStr)
         """
-        self._file = open(filePath, 'rU')
+        self._file = generalFileOpen(filePath)
         self._currentLineNumber = 0
         self._hdSyms = headerSymbols
         
