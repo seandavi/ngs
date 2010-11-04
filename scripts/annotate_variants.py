@@ -6,6 +6,9 @@ import os
 import sys
 import optparse
 import gzip
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 import ngs.regions
 
@@ -61,7 +64,6 @@ if __name__=="__main__":
     
     (opts,args)=parser.parse_args()
     ucsc = UCSC(opts.genome)
-    print (dir(ngs.regions.RegionList))
     fname=ucsc.get_table(tablebase=opts.table_name,destdir=opts.datadir)
     n=1
     reglist = ngs.regions.RegionList()
@@ -74,7 +76,7 @@ if __name__=="__main__":
     j = 0
     for line in gzip.GzipFile(fname):
         j+=1
-        if((j % 10000) == 0): print j
+        if((j % 10000) == 0): logging.info(j)
         sline = line.strip().split("\t")
         r=ngs.regions.Region(sline[1],
                              int(sline[2]),
