@@ -27,6 +27,9 @@ class Region(Range):
     def __init__(self,chromosome,rbeg,rend):
         Range.__init__(self,rbeg,rend)
         self.chromosome=chromosome
+
+    def __str__(self):
+        return("<ngs.regions.Region [%s:%d-%d]>" % (self.chromosome,self.rbeg,self.rend))
         
 class RegionList(dict):
     """A RegionList is a list of Regions on the chromosome.  This implementation
@@ -44,7 +47,11 @@ class RegionList(dict):
     
     def overlapCount(self,region):
         """Find the number of regions that overlap the given Region-like object"""
+        return(len(self.getOverlaps(regions)))
+
+    def getOverlaps(self,region):
+        """Find actual regions that overlap the given Region-like object"""
         try:
-            return(len(self[region.chromosome].find(region.rbeg,region.rend)))
+            return(self[region.chromosome].find(region.rbeg,region.rend))
         except KeyError:
-            return(0)
+            return([])
