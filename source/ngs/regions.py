@@ -29,6 +29,9 @@ class Region(Range):
         self.chromosome=chromosome
         
 class RegionList(dict):
+    """A RegionList is a list of Regions on the chromosome.  This implementation
+    is backed by a bx-python IntervalTree and is pretty fast, performing about
+    3M overlap queries per minute with a list of 100k regions in the list"""
     
     def add(self,region):
         """Add a new Region-like object to the RegionList"""
