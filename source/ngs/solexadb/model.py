@@ -67,7 +67,7 @@ class SolexaDB:
         """
         con = self.engine.connect()
         res = con.execute("""
-        select fcia.flowcellName,sr.date,r1.lane,nread,read1,read2,index_read,sequenceFile1,sequenceFile2,sequenceFile3,ssource.name as source_name,ssource.id as source_id,samp.name as sample_name,samp.id as sample_id,samp.variable as sample_variables,slib.name as library_name,slib.id as library_id, solexa_study.id as study_id, solexa_study.study_title from soldb.flowCellBasecallLane fcbcl
+        select fcia.flowcellName,sr.date,r1.lane,nread,read1,read2,index_read,sequenceFile1,sequenceFile2,sequenceFile3,ssource.name as source_name,ssource.id as source_id,samp.name as sample_name,samp.id as sample_id,samp.variable as sample_variables,samp.sample_type as sample_type,slib.name as library_name,slib.id as library_id, solexa_study.id as study_id, solexa_study.study_title from soldb.flowCellBasecallLane fcbcl
 join (select basecallFile as sequenceFile1,lane,basecallId from soldb.flowCellBasecallLane where readnumber=0) as r1 on r1.basecallId=fcbcl.basecallId and fcbcl.lane=r1.lane and fcbcl.readnumber=0
 left outer join (select basecallFile as sequenceFile2,lane,basecallId from soldb.flowCellBasecallLane where readnumber=1) as r2 on r2.basecallId=fcbcl.basecallId and r2.lane=r1.lane
 left outer join (select basecallFile as sequenceFile3,lane,basecallId from soldb.flowCellBasecallLane where readnumber=2) as r3 on r3.basecallId=fcbcl.basecallId and r3.lane=r2.lane
