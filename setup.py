@@ -9,6 +9,5 @@ setup(
     cmdclass = {'build_ext': build_ext},
     packages=find_packages('source'),
     package_dir = {'':'source'},
-    ext_modules = [Extension("ngs.regions", ["source/ngs/regions.pyx"])],
-    scripts = ['scripts/overlapVCF.py','scripts/qseq2fastq.py','scripts/gtf2picardIntervalList.py','scripts/solexaDbQseq2fastq.py']
+    scripts = ['scripts/overlapVCF.py','scripts/qseq2fastq.py','scripts/gtf2picardIntervalList.py','scripts/solexaDbQseq2fastq.py','scripts/annotate_variants.py']
     )
