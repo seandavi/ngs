@@ -8,6 +8,8 @@ import optparse
 import gzip
 import logging
 
+import pdb
+
 logging.basicConfig(level=logging.DEBUG)
 
 import ngs.regions
@@ -43,7 +45,22 @@ class UCSC:
         flocal.close()
         return(flocalfname)
 
-
+def do_overlap_queries(opts,args):
+    #ucsc = UCSC(opts.genome)
+    #ucsc.get_table(opts.table_name)
+    #ucsc = UCSC(opts.genome)
+    #fname=ucsc.get_table(tablebase=opts.table_name,destdir=opts.datadir)
+    #n=1
+    #reglist = ngs.regions.RegionList()
+    import pysam
+    tabfile=pysam.Tabixfile(opts.tabix_file,'r')
+    for line in open(args[0]):
+        sline = line.strip().split()
+        r=tabfile.fetch(reference=sline[0],
+                      start=int(sline[1])-1,
+                      end=int(sline[1]))
+        for i in r:
+            print "%s    %s" % (line,i)
 
 if __name__=="__main__":
     parser = optparse.OptionParser()
@@ -61,8 +78,11 @@ if __name__=="__main__":
                       type="int",help="The table column that represents the end location on the genome (first column is 1)")
     parser.add_option("--chrom-column",dest="chrom_column",default=2,
                       type="int",help="The table column that represents the chrom location on the genome (first column is 1)")
+    parser.add_option("--tabix-file", dest="tabix_file",
+                      help="The tabix file to be used for querying")
     
     (opts,args)=parser.parse_args()
+    do_overlap_queries(opts,args)
     ucsc = UCSC(opts.genome)
     fname=ucsc.get_table(tablebase=opts.table_name,destdir=opts.datadir)
     n=1
