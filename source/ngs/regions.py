@@ -11,8 +11,7 @@ import sys
 import os
 import unittest
 from operator import itemgetter
-
-import pdb
+import pysam
 
 from bx.intervals.intersection import IntervalTree
 
@@ -111,3 +110,34 @@ class Transcript(Region):
                 if((pos>self.cds[0]) & (pos<=self.cds[1])):
                     types.append('intron')
         return(types)
+
+class TabixBackedRegionList(object):
+    """This is a pickleable class meant to be used as a storage backend
+    for genomic regions"""
+    
+    def __init__(self,fname,build='hg18'):
+        self.build=build
+        self.fname=fname
+        self._file=pysam.Tabixfile(fname,'r')
+
+    # __getstate__ is used to pass information to pickle
+    # note that we exclude the file handle below.  
+    def __getstate__(self):
+        ret = self.__dict__.copy()
+        del ret['_file']
+        return ret
+
+    # __setstate__ is used to get information in the
+    # form of a dict from pickle.  We reconstitute
+    # the file using the fname attribute.  Note
+    # that the the update is not needed here,
+    # but in some cases we would want to remove
+    # things from the unpickled dict before proceeding.
+    # In those cases, we would del() from "d" and then
+    # update the self.__dict__.
+    def __setstate__(self, d):
+        self._file=pysam.Tabixfile(d['fname'])
+        self.__dict__.update(d)
+
+    def fetch(self,reference=None,start=None,end=None,region=None,parser=None):
+        return(self._file.fetch(reference=None,start=None,end=None,region=None,parser=None))
