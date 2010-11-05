@@ -10,6 +10,9 @@ Copyright (c) 2010 __US Government__. All rights reserved.
 import sys
 import os
 import unittest
+from operator import itemgetter
+
+import pdb
 
 from bx.intervals.intersection import IntervalTree
 
@@ -55,3 +58,56 @@ class RegionList(dict):
             return(self[region.chromosome].find(region.rbeg,region.rend))
         except KeyError:
             return([])
+
+
+class Transcript(Region):
+    def __init__(self,chromosome,name,exons,cds,strand):
+        exons.sort()
+        Region.__init__(self,chromosome,exons[0][0],exons[-1][1])
+        self.name=name
+        self.strand=strand
+        self.exons=exons
+        self.cds=cds
+        self.introns=self._computeIntrons()
+        
+
+    def __str__(self):
+        return("Transcript <%s:%s %s:%s>" %
+               (self.name,self.strand,self.chromosome,str(self.exons)))
+
+    def _computeIntrons(self):
+        self.exons.sort()
+        intronstarts=[x[1] for x in self.exons[0:-1]]
+        intronends  =[x[0] for x in self.exons[1:]]
+        introns=zip(intronstarts,intronends)
+        return(introns)
+
+    def overlaps(self,pos):
+        types=[]
+        for exon in self.exons:
+            if((pos>exon[0]) & (pos<=exon[1])):
+                if((pos>self.cds[0]) & (pos<=self.cds[1])):
+                    types.append('coding')
+                else:
+                    if(pos>self.cds[1]):
+                        if(self.strand=='+'):
+                            types.append("3'-UTR")
+                        else:
+                            types.append("5'-UTR")
+                    if(pos<=self.cds[0]):
+                        if(self.strand=='+'):
+                            types.append("5'-UTR")
+                        else:
+                            types.append("3'-UTR")
+        maxp=max(self.exons,key=itemgetter(1))[1]
+        minp=min(self.exons,key=itemgetter(0))[0]
+        if((pos>minp) & (pos<=maxp)):
+            for exon in self.exons:
+                if(((pos>exon[0]-2) & (pos<=exon[0])) |
+                   ((pos>exon[1]) & (pos<=exon[1]+2))):
+                    types.append('splice-site')
+        for intron in self.introns:
+            if((pos>intron[0]) & (pos<=intron[1])):
+                if((pos>self.cds[0]) & (pos<=self.cds[1])):
+                    types.append('intron')
+        return(types)
