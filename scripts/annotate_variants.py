@@ -7,6 +7,10 @@ import sys
 import optparse
 import gzip
 import csv
+import logging
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 import ngs.regions
 
@@ -66,6 +70,22 @@ def do_gene_based_annotation(opts,args):
                     print row,transcript.overlaps(r.rend)
 
 
+def do_overlap_queries(opts,args):
+    #ucsc = UCSC(opts.genome)
+    #ucsc.get_table(opts.table_name)
+    #ucsc = UCSC(opts.genome)
+    #fname=ucsc.get_table(tablebase=opts.table_name,destdir=opts.datadir)
+    #n=1
+    #reglist = ngs.regions.RegionList()
+    import pysam
+    tabfile=pysam.Tabixfile(opts.tabix_file,'r')
+    for line in open(args[0]):
+        sline = line.strip().split()
+        r=tabfile.fetch(reference=sline[0],
+                      start=int(sline[1])-1,
+                      end=int(sline[1]))
+        for i in r:
+            print "%s    %s" % (line,i)
 
 if __name__=="__main__":
     parser = optparse.OptionParser()
@@ -86,12 +106,15 @@ if __name__=="__main__":
     parser.add_option("-g","--gene-based-annotation",
                       dest="gene_based",action="store_true",
                       default=False,help="Do gene-based annotation")
+    parser.add_option("--tabix-file", dest="tabix_file",
+                      help="The tabix file to be used for querying")
     
     (opts,args)=parser.parse_args()
     if(opts.gene_based):
         do_gene_based_annotation(opts,args)
+    
+    do_overlap_queries(opts,args)
     ucsc = UCSC(opts.genome)
-    print (dir(ngs.regions.RegionList))
     fname=ucsc.get_table(tablebase=opts.table_name,destdir=opts.datadir)
     n=1
     reglist = ngs.regions.RegionList()
@@ -104,7 +127,7 @@ if __name__=="__main__":
     j = 0
     for line in gzip.GzipFile(fname):
         j+=1
-        if((j % 10000) == 0): print j
+        if((j % 10000) == 0): logging.info(j)
         sline = line.strip().split("\t")
         r=ngs.regions.Region(sline[1],
                              int(sline[2]),
