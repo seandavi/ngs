@@ -5,11 +5,11 @@ from distutils.extension import Extension
 setup(
     name="NGS",
     version="0.1",
-    packages=find_packages('source'),
-    package_dir = {'':'source'},
-        install_requires=[
-        # "pysam>=0.3.0",
-        # "Cython", # This is required by pysam
+    packages=find_packages('.'),
+    package_dir = {'':'.'},
+    install_requires=[
+        "pysam>=0.3.1",
+        "Cython", # This is required by pysam
         "bx-python"
     ],
     scripts = ['scripts/overlapVCF.py',
