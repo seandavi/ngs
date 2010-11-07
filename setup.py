@@ -10,7 +10,8 @@ setup(
     install_requires=[
         "pysam>=0.3.1",
         "Cython", # This is required by pysam
-        "bx-python"
+        "bx-python",
+        "pyfasta"
     ],
     scripts = ['scripts/overlapVCF.py',
                'scripts/qseq2fastq.py',
