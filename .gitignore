@@ -9,3 +9,5 @@ NGS.egg-info
 *.so
 
 *#
+*.flat
+*.gdx
