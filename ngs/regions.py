@@ -46,6 +46,14 @@ class RegionList(dict):
             itree = IntervalTree()
             itree.insert(region.rbeg,region.rend,region)
             self[region.chromosome]=itree
+
+    def addObject(self,chromosome,rbeg,rend,obj,strand="+"):
+        try:
+            self[chromosome].insert(rbeg,rend,obj)
+        except KeyError:
+            itree = IntervalTree()
+            itree.insert(rbeg,rend,obj)
+            self[chromosome]=itree
     
     def overlapCount(self,region):
         """Find the number of regions that overlap the given Region-like object"""
