@@ -38,16 +38,7 @@ class RegionList(dict):
     is backed by a bx-python IntervalTree and is pretty fast, performing about
     3M overlap queries per minute with a list of 100k regions in the list"""
     
-    def add(self,region):
-        """Add a new Region-like object to the RegionList"""
-        try:
-            self[region.chromosome].insert(region.rbeg,region.rend,region)
-        except KeyError:
-            itree = IntervalTree()
-            itree.insert(region.rbeg,region.rend,region)
-            self[region.chromosome]=itree
-
-    def addObject(self,chromosome,rbeg,rend,obj,strand="+"):
+    def addObject(self,chromosome,rbeg,rend,obj=True,strand="+"):
         try:
             self[chromosome].insert(rbeg,rend,obj)
         except KeyError:
@@ -55,14 +46,14 @@ class RegionList(dict):
             itree.insert(rbeg,rend,obj)
             self[chromosome]=itree
     
-    def overlapCount(self,region):
+    def overlapCount(self,chromosome,rbeg,rend,strand='+'):
         """Find the number of regions that overlap the given Region-like object"""
-        return(len(self.getOverlaps(regions)))
+        return(len(self.getOverlaps(chromosome,rbeg,rend,strand)))
 
-    def getOverlaps(self,region):
+    def getOverlaps(self,chromosome,rbeg,rend,strand='+'):
         """Find actual regions that overlap the given Region-like object"""
         try:
-            return(self[region.chromosome].find(region.rbeg,region.rend))
+            return(self[region.chromosome].find(rbeg,rend))
         except KeyError:
             return([])
 
