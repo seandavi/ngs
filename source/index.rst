@@ -13,6 +13,7 @@ Contents:
    
    formats.rst
    solexadb.rst
+   regions.rst
    todo.rst
 
 Indices and tables
