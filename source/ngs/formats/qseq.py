@@ -174,7 +174,7 @@ class seqprbFile:
                 self._seqfile=gzip.GzipFile(mode='r',fileobj=fhs[0])
             else:
                 self._seqfile=fhs[0]
-            if(fhs[2].name.endswith(".gz")):
+            if(fhs[1].name.endswith(".gz")):
                 self._prbfile=gzip.GzipFile(mode='r',fileobj=fhs[1])
             else:
                 self._prbfile=fhs[1]
@@ -182,7 +182,7 @@ class seqprbFile:
             self._seqfile=generalFileOpen(filenames[0],'r')
             self._prbfile=generalFileOpen(filenames[1],'r')
 
-    def parse(self,split):
+    def parse(self,split=None):
         """
         Parse a seq/prb file pair into fastq chunks.
 
