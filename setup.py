@@ -16,5 +16,7 @@ setup(
                'scripts/qseq2fastq.py',
                'scripts/gtf2picardIntervalList.py',
                'scripts/solexaDbQseq2fastq.py',
-               'scripts/annotate_variants.py']
+               'scripts/ngCGH.py',
+               'scripts/annotate_variants.py',
+               'scripts/readLengthHistogram.py']
     )
