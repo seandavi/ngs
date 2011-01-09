@@ -13,7 +13,6 @@ def phred64ToStdqual(qualin):
     return(''.join([chr(ord(x)-31) for x in qualin]))
 
 def outputFastq(f2,outfile,phred33=False):
-    print(outfile)
     for line in f2:
         sp = line.strip().split("\t")
         qual=sp[9]
