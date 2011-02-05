@@ -67,23 +67,40 @@ class SolexaDB:
         """
         con = self.engine.connect()
         res = con.execute("""
-        select fcia.flowcellName,sr.date,r1.lane,nread,read1,read2,index_read,sequenceFile1,sequenceFile2,sequenceFile3,ssource.name as source_name,ssource.id as source_id,samp.name as sample_name,samp.id as sample_id,samp.variable as sample_variables,samp.sample_type as sample_type,slib.name as library_name,slib.id as library_id, solexa_study.id as study_id, solexa_study.study_title from soldb.flowCellBasecallLane fcbcl
-join (select basecallFile as sequenceFile1,lane,basecallId from soldb.flowCellBasecallLane where readnumber=0) as r1 on r1.basecallId=fcbcl.basecallId and fcbcl.lane=r1.lane and fcbcl.readnumber=0
-left outer join (select basecallFile as sequenceFile2,lane,basecallId from soldb.flowCellBasecallLane where readnumber=1) as r2 on r2.basecallId=fcbcl.basecallId and r2.lane=r1.lane
-left outer join (select basecallFile as sequenceFile3,lane,basecallId from soldb.flowCellBasecallLane where readnumber=2) as r3 on r3.basecallId=fcbcl.basecallId and r3.lane=r2.lane
-join flowCellBasecall fcbc on fcbcl.basecallId=fcbc.id
-join solexa.uniqueByMaxDateFlowCellBaseCallLane u on fcbc.id=u.basecallid and fcbcl.lane=u.lane
-join flowCellImageAnalysis fcia on fcbc.imageAnalysisId=fcia.id
-join solexa_run sr on sr.flowcell=fcia.flowcellName
-join solexa_lane sl on sr.id=sl.run_id and sl.lane=fcbcl.lane
-join solexa_library slib on slib.id=sl.library_id
-join solexa_sample_library samplib on samplib.library_id=slib.id
-join solexa_sample samp on samp.id=samplib.sample_id
-join solexa_source_sample soursamp on soursamp.sample_id=samp.id
-join solexa_source ssource on ssource.id=soursamp.source_id
-join solexa_study_sample on solexa_study_sample.sample_id=samp.id
-join solexa_study on solexa_study_sample.study_id=solexa_study.id
-where study_id=%d
+select distinct 
+	   r1.Flowcell, 
+       r1.Lane, 
+       r1.sequenceFile as r1sequence, 
+       r2.sequenceFile as r2sequence,
+       solexa_source.name as source_name,
+       solexa_sample.name as sample_name,
+       solexa_library.name as library_name,
+       solexa_study.id as study_id,
+       solexa_study.study_title as study_title,
+       solexa_sample.variable as sample_variable,
+       solexa_sample.sample_type,
+       solexa_run.id as run_id,
+       solexa_lane.id as lane_id,
+       solexa_source.id as source_id,
+       solexa_sample.id as sample_id,
+       solexa_library.id as library_id,
+       r1.`Paired-End`,
+       r1.index_read,
+       r1.pooled_library
+from (select * from solexa_alignment where Read_Direction=0) r1 
+	left outer join
+    (select sequenceFile, Flowcell, Lane from solexa_alignment where Read_Direction=1) r2 
+    on r1.flowcell=r2.flowcell and r1.lane=r2.lane
+    join solexa_run on r1.flowcell=solexa_run.FlowCell
+    join solexa_lane on solexa_run.id=solexa_lane.run_id and r1.lane=solexa_lane.lane
+    join solexa_library on solexa_lane.library_id=solexa_library.id
+    join `solexa_sample_library` on solexa_sample_library.library_id=solexa_library.id 
+    join solexa_sample on solexa_sample_library.sample_id=solexa_sample.id
+    join solexa_source_sample on solexa_source_sample.sample_id=solexa_sample.id
+    join solexa_source on solexa_source.id=solexa_source_sample.source_id
+    join solexa_study_sample on solexa_study_sample.sample_id=solexa_sample.id
+    join solexa_study on solexa_study.id=solexa_study_sample.study_id
+    where study_id=%d
 """ % (study_id))
         keys = res.keys()
         return({'keys':res.keys(),'rows':res.fetchall()})
