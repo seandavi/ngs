@@ -2,12 +2,15 @@
 import csv
 import sys
 
+if(len(sys.argv)!=2):
+    exit("Error: Takes the filename of a UCSC-style BED12 file")
+
 f = open(sys.argv[1],'r')
 reader = csv.reader(f,delimiter="\t")
 reader.next()
 for row in reader:
     acc=row[1]
-    chrom=row[2].replace('chr','')
+    chrom=row[2]
     name=row[12]
     if(row[3]=="+"):
         starts=[int(x) for x in row[9].split(",")[:-1]]
