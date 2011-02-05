@@ -13,6 +13,7 @@ setup(
         "bx-python"
     ],
     scripts = ['scripts/overlapVCF.py',
+               'scripts/ngtools',
                'scripts/qseq2fastq.py',
                'scripts/gsnapSplicePrep.py',
                'scripts/gtf2picardIntervalList.py',
