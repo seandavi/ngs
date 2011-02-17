@@ -4,17 +4,17 @@ from ngs.main import logger
 import ngs.solexadb.model
 
 
-def _doRsync(fromloc,toloc,fname):
-    res = subprocess.call(['rsync','-avp',os.path.join(fromloc,fname),
-                           os.path.join(toloc,fname)])
+def _doRsync(fromloc,toloc,fnameremote,fnamelocal):
+    res = subprocess.call(['rsync','-avp',os.path.join(fromloc,fnameremote),
+                           os.path.join(toloc,fnamelocal)])
     if(res==0):
         logger.debug('Successfully transferred %s ==> %s' % (
-            os.path.join(fromloc,fname),
-            os.path.join(toloc,fname)))
+            os.path.join(fromloc,fnameremote),
+            os.path.join(toloc,fnamelocal)))
     else:
         logger.error('Error transferring %s ==> %s' % (
-            os.path.join(fromloc,fname),
-            os.path.join(toloc,fname)))
+            os.path.join(fromloc,fnameremote),
+            os.path.join(toloc,fnamelocal)))
         
 
 
@@ -22,13 +22,21 @@ def func(args):
     r = csv.DictReader(open(args.samplesheet,'r'),delimiter="\t")
     for row in r:
         for read in ['r1sequence','r2sequence']:
-            fname=row[read]
-            if(fname is ""):
-                logger.error('Empty sequence file %s found for row:\n%s' % (read,row))
+            if(read=='r1sequence'):
+                row[read]=row[read].replace('_1,2_','_1_')
+            if(read=='r2sequence'):
+                row[read]=row[read].replace('_1,2_','_2_')
+            fnameremote=row[read]
+            if(fnameremote=="None"):
+                logger.info('Empty sequence file %s found for row:\n%s' % (read,row))
             if(args.altsuffix):
-                fname=fname.replace('.tgz',args.altsuffix)
-            _doRsync(args.fromloc,args.toloc,fname)
-            
+                fnameremote=fnameremote.replace('.tgz',args.altsuffix)
+            fnamelocal=fnameremote # default same name
+            if((int(row['index_read'])>0) & (read=='r2sequence')):
+                logger.info("Found a lane with indexing, so transferring the third read and renaming to read 2")
+                fnameremote=fnameremote.replace('_2_','_3_')
+            _doRsync(args.fromloc,args.toloc,fnameremote,fnamelocal)
+
         
 
 subparser = subparsers.add_parser(
