@@ -49,6 +49,15 @@ def doNormalComparisonCGH(opts,args):
                                               j))
                 n=0
 
+def median(vect):
+    vect.sort()
+    x = len(vect)
+    if(x%2):
+        return((vect[x/2]+vect[(x/2)+1])/2)
+    else:
+        return(vect[x/2])
+            
+
 def main():
     logging.basicConfig(level=10)
     logger = logging.getLogger('CGH')

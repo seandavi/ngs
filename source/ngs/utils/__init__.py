@@ -15,7 +15,10 @@ iupac={'A':'A',
        'N':['A','C','T','G']}
 
 def iupac2base(word):
-    return(iupac[word])
+    try:
+        return(iupac[word])
+    except KeyError:
+        return(word)
 
 if __name__ == "__main__":
     import sys

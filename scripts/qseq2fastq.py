@@ -61,8 +61,12 @@ def tarFileExtractor(options,fname):
                 seqfile=tfile.extractfile(fname)
                 prbfile=tfile.extractfile(fname.replace('seq','prb'))
                 seqprbParser=ngs.formats.qseq.seqprbFile(fhs=(seqfile,prbfile))
-                for fq in seqprbParser.parse():
-                    outfile.write(fq + "\n")
+                if(options.split is not None):
+                    for fq in seqprbParser.parse():
+                        outfile.write(fq + "\n")
+                else:
+                    for fq in seqprbParser.parse():
+                        outfile.write(fq[1] + "\n")
         return
 
 usage = """%prog [options] TarFileOrBustardDirectoryName
@@ -87,6 +91,8 @@ parser.add_option("-o","--outfile",dest="outfile",default=None,
                   help="Output file name")
 parser.add_option("-w","--overwrite",dest="overwrite",action="store_true",
                   default=False,help="Overwrite existing file with same name")
+parser.add_option("-s","--split-seqprb",dest="split",default=None,
+                  help="""For seq/prb files, multiple reads are stored in a single pair of files.  Specify a split value (1-based) representing the last base of the first read (80 for paired 80mers, for example)""")
 
 
 
