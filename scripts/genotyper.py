@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import subprocess
+import re
 from collections import defaultdict
 from math import log10,pow
 
@@ -9,35 +9,72 @@ def phred2prob(phred):
 def prob2phred(prob):
     return(-10*log10(prob))
 
+def ascii2int(ascii):
+    return ord(x)-33
+
 class PileupRecord(object):
+    indelmatchre=re.compile('\d+')
+    
     def __init__(self,line):
         sline = line.strip().split("\t")
         self.chrom=sline[0]
         self.position=int(sline[1])
         self.reference=sline[2]
-        self.rawbases=sline[4]
-        self.rawquals=sline[5]
+        self.rawbases=list(sline[4])
+        self.rawquals=list(sline[5])
 
-
+    def _getIndelBaseLength(self,j):
+        nums=""
+        k=j+1
+        while self.rawbases[k] in '0123456789':
+            nums+=self.rawbases[k]
+            k+=1
+        return(len(nums)+int(nums))
+    
     def _getBaseVals(self):
-        quals=(ord(x)-33 for x in self.rawquals)
+        quals=[]
         bases=[]
+        strands=[]
         skip=0
-        for i in self.rawbases:
-            if(skip>0):
-                skip-=1
+        i=0
+        j=0
+        while i<len(self.rawquals):
+            nextval=self.rawbases[j]
+            if(nextval=="+"):
+                j+=self._getIndelBaseLength(j)+1
                 continue
-            if((i=='^') | (i=='$')):
-                skip=1
+            if(nextval=="-"):
+                j+=self._getIndelBaseLength(j)+1
                 continue
-            if(i=='.'):
+            if(nextval=='^'):
+                j+=2
+                continue
+            if(nextval=="$"):
+                j+=1
+                continue
+            if(nextval in "<>"):
+                i+=1
+                j+=1
+                continue
+            if(nextval in 'actg,'):
+                strands.append('-')
+            else:
+                strands.append('+')
+            quals.append(ord(self.rawquals[i])-33)
+            if(nextval=='.'):
                 bases.append(self.reference.upper())
+                i+=1
+                j+=1
                 continue
-            if(i==','):
-                bases.append(self.reference.lower())
+            if(nextval==','):
+                bases.append(self.reference.upper())
+                i+=1
+                j+=1
                 continue
-            bases.append(i)
-        return(zip(bases,quals))
+            bases.append(nextval.upper())
+            i+=1
+            j+=1
+        return(zip(bases,quals,strands))
         
     def baselist(self):
         try:
@@ -50,39 +87,35 @@ class PileupRecord(object):
         tmp=defaultdict(int)
         for i in self.baselist(): tmp[i[0].upper()]+=1
         return(tmp)
-    
-
-    def genotype(self,freq=(0.9999,0.0001)):
-        z=tuple(self.getBaseCounts())
-        print(z)
-        pg00=prob2phred(freq[0]*freq[0])
-        pg11=prob2phred(freq[1]*freq[1])
-        pg01=prob2phred(2*freq[0]*freq[1])
-        # only one allele in reads
-        if(len(z)==1):
-            prg00=prg11=0
-            prg01=prob2phred(pow(0.5,z[1]))
-            if(z[0][0]==self.reference):
-                print("ref")
-                prg00=sum(prob2phred(1-phred2prob(x[1])) for x in self.baselist())
-                prg11=sum(x[1] for x in self.baselist())
-            else:
-                print("var")
-                prg11=sum(prob2phred(1-phred2prob(x[1])) for x in self.baselist())
-                prg00=sum(x[1] for x in self.baselist())
-            pr=prob2phred(phred2prob(prg01+pg01)+
-                          phred2prob(prg11+pg11)+
-                          phred2prob(prg00+pg00))
-            pgr00=pg00+prg00-pr
-            pgr01=pg01+prg01-pr
-            pgr11=pg11+prg11-pr
-            print('pg00:%f\npg11%f\npg01%f\nprg00:%d\nprg11%d\nprg01%d\n' %
-                  (pg00,pg11,pg01,prg00,prg11,prg01))
-            return((phred2prob(pgr00),phred2prob(pgr01),phred2prob(pgr11),self.baselist()))
-        # at least 2 alleles
-        else:
             
-        
-            
-        
 
+if __name__=="__main__":
+    import collections,sys
+    f = open(sys.argv[1],'r')
+    for line in f:
+        x = PileupRecord(line)
+        y = x._getBaseVals()
+        d = dict((base,[0,0]) for base in ['N','A','C','T','G','*'])
+        totbases=0
+        for base in y:
+            if(base[1]>13):
+                totbases+=1
+                if(base[2]=="+"):
+                    d[base[0]][0]+=1
+                else:
+                    d[base[0]][1]+=1
+        if(totbases==0):
+            continue
+        maxbase=None
+        maxcount=0
+        for base in d.keys():
+            totbase=sum(d[base])
+            if((base!=x.reference.upper()) & ((float(totbase)/totbases)>0.3) & (totbase>3)):
+                if(totbase>maxcount):
+                    maxbase=base
+                    maxcount=totbase
+        if(maxcount>0):
+            print "\t".join([str(z) for z in [x.chrom,x.position,x.reference,
+                                              maxbase,d[x.reference.upper()],d[maxbase]]])
+        
+                
