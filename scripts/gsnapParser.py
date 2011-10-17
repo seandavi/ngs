@@ -21,11 +21,19 @@ class GsnapRead(object):
     def __init__(self,line):
         self.readinfo = line
         self.alignments = []
+    def __repr__(self):
+        return("<GsnapRead with %d alignments>" % (len(self.alignments)))
 
-class GsnapAlignment(list):
+class GsnapAlignment(object):
     def __init__(self,line):
-        self.aligninfo = line
-        self.blocks = []
+        self.info = line
+        self.blocks = [line]
+    def __repr__(self):
+        return("<GsnapAlignment with %d blocks>" % (len(self.blocks)))
+
+class GsnapBlock(object):
+    def __init__(self,line):
+        self.info = line
 
 class GsnapFile(object):
     def __init__(self,f):
@@ -33,30 +41,14 @@ class GsnapFile(object):
         self.nextline= self.fh.next()
         self.nextRecord = self._getNextRecord()
 
-    def _getReads(self,lines):
-        curread = None
-        curalign= None
-        recs = []
-        for i in range(len(lines)):
-            if(lines[i].startswith('>') or lines[i].startswith('<')):
-                if(curread is not None):
-                    recs.append(curread)
-                curread = {'alignments':[],'read':lines[i]}
-            if(lines[i].startswith(' ')):
-                if(curalign is not None):
-                    curread['alignments'].append(curalign)
-                curalign = {'blocks':[],'alignment':lines[i]}
-            if(lines[i].startswith(',')):
-                curalign['blocks'].append(lines[i])
-        return(recs)
-               
-
     def _getNextRecord(self):
+        if(self.nextline==''):
+            return(None)
         line = self.nextline
         lines=[]
         lines.append(line)
         line = self.fh.next()
-        while(not (line.startswith('>'))):
+        while(not (line.startswith('>')) & (line!='')):
             lines.append(line)
             line = self.fh.next()
         self.nextline=line
@@ -66,14 +58,17 @@ class GsnapFile(object):
         for i in range(len(lines)):
             if(lines[i].startswith('>') or lines[i].startswith('<')):
                 if(curread is not None):
+                    if(curalign is not None):
+                        curread.alignments.append(curalign)
                     recs.append(curread)
-                curread = {'alignments':[],'read':lines[i]}
+                curread = GsnapRead(lines[i])
             if(lines[i].startswith(' ')):
                 if(curalign is not None):
-                    curread['alignments'].append(curalign)
-                curalign = {'blocks':[],'alignment':lines[i]}
+                    curread.alignments.append(curalign)
+                curalign = GsnapAlignment(lines[i])
             if(lines[i].startswith(',')):
-                curalign['blocks'].append(lines[i])
+                curalign.blocks.append(GsnapBlock(lines[i]))
+        recs.append(curread)
         return(recs)
 
     def __iter__(self):
@@ -96,6 +91,9 @@ if __name__ == '__main__':
     parser.add_argument('filename')
     opts = parser.parse_args()
     g = GsnapFile(opts.filename)
+    j = 0
     for rec in g:
+        j+=1
         print rec
-        
+
+    print j
