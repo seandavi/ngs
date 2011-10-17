@@ -60,8 +60,21 @@ class GsnapFile(object):
             lines.append(line)
             line = self.fh.next()
         self.nextline=line
-        rec = self._getReads(lines)
-        return(rec)
+        curread = None
+        curalign= None
+        recs = []
+        for i in range(len(lines)):
+            if(lines[i].startswith('>') or lines[i].startswith('<')):
+                if(curread is not None):
+                    recs.append(curread)
+                curread = {'alignments':[],'read':lines[i]}
+            if(lines[i].startswith(' ')):
+                if(curalign is not None):
+                    curread['alignments'].append(curalign)
+                curalign = {'blocks':[],'alignment':lines[i]}
+            if(lines[i].startswith(',')):
+                curalign['blocks'].append(lines[i])
+        return(recs)
 
     def __iter__(self):
         return(self)
