@@ -4,13 +4,14 @@ from distutils.extension import Extension
 
 setup(
     name="NGS",
-    version="0.1",
+    version="0.2.0",
     packages=find_packages('source'),
     package_dir = {'':'source'},
         install_requires=[
         # "pysam>=0.3.0",
         # "Cython", # This is required by pysam
-        "bx-python"
+        "bx-python",
+        "ruffus"
     ],
     scripts = ['scripts/overlapVCF.py',
                'scripts/ngtools',
