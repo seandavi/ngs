@@ -21,5 +21,8 @@ setup(
                'scripts/ngCGH.py',
                'scripts/annotate_variants.py',
                'scripts/cg_somaticcalls2annovar.py',
-               'scripts/readLengthHistogram.py']
+               'scripts/readLengthHistogram.py',
+               'scripts/addAnnotationToMAF.py',
+               'scripts/addGeneExpressionToMAF.py',
+               'scripts/combineCufflinksGeneFiles.py']
     )
