@@ -24,6 +24,7 @@ opts=parser.parse_args()
 fname=opts.fname
 fname1 = fname.replace('.bam','.md.bam')
 fname2 = fname1.replace('.md.bam','.md.realigned.bam')
+fname3 = fname2.replace('.md.realigned.bam','.md.recal.realigned.bam')
 with open(opts.config) as configfile:
     config=json.load(configfile)
 
@@ -53,15 +54,29 @@ def indel_realign(input,output):
 @transform(fname2,suffix('.md.realigned.bam'),'.md.recal_data.csv')
 @follows(indel_realign)
 def count_covariates(input,output):
-    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/GATK/GenomeAnalysisTK.jar -T CountCovariates -knownSites /data/sedavis/public/GATK/dbsnp_132.hg19.reforder.vcf.gz -R /data/sedavis/public/sequences/ucsc/hg19/genome.fa --default_platform illumina -I %s -recal_file %s -cov ReadGroupCovariate -cov QualityScoreCovariate -cov CycleCovariate -cov DinucCovariate""" % (input,output)
+    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/GATK/GenomeAnalysisTK.jar -T CountCovariates --knownSites /data/sedavis/public/GATK/dbsnp_132.hg19.reforder.vcf.gz -R /data/sedavis/public/sequences/ucsc/hg19/genome.fa --default_platform illumina -I %s --recal_file %s -cov ReadGroupCovariate -cov QualityScoreCovariate -cov CycleCovariate -cov DinucCovariate""" % (input,output)
     return run_job(cmd)
     
 
 @transform(fname2,suffix('.md.realigned.bam'),add_inputs(r'\1.md.recal_data.csv'),'.md.recal.realigned.bam')
 @follows(count_covariates)
 def quality_recalibrate(input,output):
-    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/GATK/GenomeAnalysisTK.jar -T TableRecalibration --default_platform illumina --knownSites /data/sedavis/public/GATK/dbsnp_132.hg19.reforder.vcf.gz -R /data/sedavis/public/sequences/ucsc/hg19/genome.fa -o %s -I %s --recal_file %s""" % (output,input[0],input[1])
+    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/GATK/GenomeAnalysisTK.jar -T TableRecalibration --default_platform illumina -R /data/sedavis/public/sequences/ucsc/hg19/genome.fa -o %s -I %s --recal_file %s""" % (output,input[0],input[1])
     return run_job(cmd)
+
+@transform(fname3,suffix('.md.recal.realigned.bam'),['.insert_histogram','.insert_size.txt'])
+@follows(quality_recalibrate)
+def insert_size_metrics(input,output):
+    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CollectInsertSizeMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa ASSUME_SORTED=true HISTOGRAM_FILE=%s INPUT=%s OUTPUT=%s""" % (output[0],input,output[1])
+    return run_job(cmd)
+
+@transform(fname3,suffix('.md.recal.realigned.bam'),['.gc_bias_summary.txt','.gc_bias.txt','.gc_chart'])
+@follows(quality_recalibrate)
+def gc_bias_metrics(input,output):
+    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CollectGcBiasMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s OUTPUT=%s CHART_OUTPUT=%s SUMMARY_OUTPUT=%s""" % (input,output[1],output[2],output[1])
+    return run_job(cmd)
+
+
 
 
 import logging
@@ -77,9 +92,9 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-pipeline_run([quality_recalibrate],verbose=5,logger=logger,log_exceptions=True,
+pipeline_run([gc_bias_metrics,insert_size_metrics],verbose=5,logger=logger,log_exceptions=True,
              exceptions_terminate_immediately = True)
-## pipeline_printout_graph(open('flowchart.svg','w'),
-##                         'svg',
-##                         [quality_recalibrate]
-##                         )
+#pipeline_printout_graph(open('flowchart.svg','w'),
+#                         'svg',
+#                         [gc_bias_metrics,insert_size_metrics]
+#                         )
