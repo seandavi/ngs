@@ -79,7 +79,7 @@ def insert_size_metrics(input,output):
 @follows(quality_recalibrate)
 @transform(fname3,suffix('.md.recal.realigned.bam'),add_inputs('/data/sedavis/sequencing/capture/SureSelect_All_Exon_50mb_with_annotation_hg19.interval_list','/data/sedavis/sequencing/capture/refgene.cdsonly.hg19.interval_list'),['.hsmetrics','.target.hsmetrics'])
 def hs_metrics(input,output):
-    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CalculateHsMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s BAIT_INTERVAL2=%s TARGET_INTERVALS=%s OUTPUT=%s PER_TARGET_COVERAGE=%s """ % (input[0],input[1],input[2],output[0],output[1])
+    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CalculateHsMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s BAIT_INTERVALS=%s TARGET_INTERVALS=%s OUTPUT=%s PER_TARGET_COVERAGE=%s """ % (input[0],input[1],input[2],output[0],output[1])
     return run_job(cmd)
 
 @follows(hs_metrics,insert_size_metrics)
@@ -102,9 +102,9 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-pipeline_printout_graph(open('flowchart.svg','w'),
-                         'svg',
-                         [final_task]
-                         )
+#pipeline_printout_graph(open('flowchart.svg','w'),
+#                         'svg',
+#                         [final_task]
+#                         )
 pipeline_run([final_task],verbose=5,logger=logger,log_exceptions=True,
              exceptions_terminate_immediately = True)
