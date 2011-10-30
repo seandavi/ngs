@@ -25,5 +25,6 @@ setup(
                'scripts/readLengthHistogram.py',
                'scripts/addAnnotationToMAF.py',
                'scripts/addGeneExpressionToMAF.py',
+               'scripts/exomecapture.py',
                'scripts/combineCufflinksGeneFiles.py']
     )
