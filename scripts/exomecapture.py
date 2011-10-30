@@ -70,11 +70,21 @@ def insert_size_metrics(input,output):
     cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CollectInsertSizeMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa ASSUME_SORTED=true HISTOGRAM_FILE=%s INPUT=%s OUTPUT=%s""" % (output[0],input,output[1])
     return run_job(cmd)
 
-@transform(fname3,suffix('.md.recal.realigned.bam'),['.gc_bias_summary.txt','.gc_bias.txt','.gc_chart'])
+## @transform(fname3,suffix('.md.recal.realigned.bam'),['.gc_bias_summary.txt','.gc_bias.txt','.gc_chart'])
+## @follows(quality_recalibrate)
+## def gc_bias_metrics(input,output):
+##     cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CollectGcBiasMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s OUTPUT=%s CHART_OUTPUT=%s SUMMARY_OUTPUT=%s""" % (input,output[1],output[2],output[1])
+##     return run_job(cmd)
+
 @follows(quality_recalibrate)
-def gc_bias_metrics(input,output):
-    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CollectGcBiasMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s OUTPUT=%s CHART_OUTPUT=%s SUMMARY_OUTPUT=%s""" % (input,output[1],output[2],output[1])
+@transform(fname3,suffix('.md.recal.realigned.bam'),add_inputs('/data/sedavis/sequencing/capture/SureSelect_All_Exon_50mb_with_annotation_hg19.interval_list','/data/sedavis/sequencing/capture/refgene.cdsonly.hg19.interval_list'),['.hsmetrics','.target.hsmetrics'])
+def hs_metrics(input,output):
+    cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CalculateHsMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s BAIT_INTERVAL2=%s TARGET_INTERVALS=%s OUTPUT=%s PER_TARGET_COVERAGE=%s """ % (input[0],input[1],input[2],output[0],output[1])
     return run_job(cmd)
+
+@follows(hs_metrics,insert_size_metrics)
+def final_task(input,output):
+    pass
 
 
 
@@ -92,9 +102,9 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-pipeline_run([gc_bias_metrics,insert_size_metrics],verbose=5,logger=logger,log_exceptions=True,
+pipeline_printout_graph(open('flowchart.svg','w'),
+                         'svg',
+                         [final_task]
+                         )
+pipeline_run([final_task],verbose=5,logger=logger,log_exceptions=True,
              exceptions_terminate_immediately = True)
-#pipeline_printout_graph(open('flowchart.svg','w'),
-#                         'svg',
-#                         [gc_bias_metrics,insert_size_metrics]
-#                         )
