@@ -85,7 +85,7 @@ def hs_metrics(input,output):
 @follows(quality_recalibration)
 @transform(fname3,suffix('.md.recal.realigned.bam'),'.raw.vcf')
 def single_mpileup(input,output):
-    cmd = """/usr/local/samtools/samtools mpileup -uDSf /data/sedavis/public/sequences/ucsc/hg19/genome.fa %s | /usr/local/samtools/bcftools view - > VCF/%s""" % (input,output)
+    cmd = """/usr/local/samtools/samtools mpileup -uDSf /data/sedavis/public/sequences/ucsc/hg19/genome.fa %s | /usr/local/samtools/bcftools/bcftools view - > VCF/%s""" % (input,output)
 
 @posttask(touch_file(os.path.join('log',fname3 + ".finished")))
 @follows(hs_metrics,insert_size_metrics)
