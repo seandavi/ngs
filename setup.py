@@ -26,5 +26,6 @@ setup(
                'scripts/addAnnotationToMAF.py',
                'scripts/addGeneExpressionToMAF.py',
                'scripts/exomecapture.py',
+               'scripts/pairedsample.py',
                'scripts/combineCufflinksGeneFiles.py']
     )
