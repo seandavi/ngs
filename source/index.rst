@@ -14,6 +14,7 @@ Contents:
    formats.rst
    solexadb.rst
    todo.rst
+   ruffus.rst
 
 Indices and tables
 ==================
