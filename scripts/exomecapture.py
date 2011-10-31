@@ -82,7 +82,7 @@ def hs_metrics(input,output):
     cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CalculateHsMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s BAIT_INTERVALS=%s TARGET_INTERVALS=%s OUTPUT=%s PER_TARGET_COVERAGE=%s """ % (input[0],input[1],input[2],output[0],output[1])
     return run_job(cmd)
 
-@follows(quality_recalibration)
+@follows(quality_recalibrate)
 @transform(fname3,suffix('.md.recal.realigned.bam'),'.raw.vcf')
 def single_mpileup(input,output):
     cmd = """/usr/local/samtools/samtools mpileup -uDSf /data/sedavis/public/sequences/ucsc/hg19/genome.fa %s | /usr/local/samtools/bcftools/bcftools view - > VCF/%s""" % (input,output)
