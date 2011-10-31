@@ -82,7 +82,7 @@ def hs_metrics(input,output):
     cmd = """/usr/local/bin/java64 -Xmx4g -jar /usr/local/picard/CalculateHsMetrics.jar VALIDATION_STRINGENCY=SILENT REFERENCE_SEQUENCE=/data/sedavis/public/sequences/ucsc/hg19/genome.fa INPUT=%s BAIT_INTERVALS=%s TARGET_INTERVALS=%s OUTPUT=%s PER_TARGET_COVERAGE=%s """ % (input[0],input[1],input[2],output[0],output[1])
     return run_job(cmd)
 
-@post_task(touch_file(os.path.join('log',fname3 + ".finished")))
+@posttask(touch_file(os.path.join('log',fname3 + ".finished")))
 @follows(hs_metrics,insert_size_metrics)
 def finalize():
     pass
