@@ -7,8 +7,12 @@ import os
 import json
 import shlex
 
-def run_job(cmd):
-    retval = subprocess.call(shlex.split(cmd))
+def run_job(cmd,shell=False):
+    retval = None
+    if(shell):
+        retval = subprocess.call(cmd,shell=True)
+    else:
+        retval = subprocess.call(shlex.split(cmd))
     if(retval!=0):
         raise JobFailedException("Command failed, command string: '%s'" % cmd)
         return False
@@ -83,10 +87,10 @@ def hs_metrics(input,output):
     return run_job(cmd)
 
 @follows(quality_recalibrate)
-@transform(fname3,suffix('.md.recal.realigned.bam'),'.raw.vcf')
+@transform(fname3,suffix('.md.recal.realigned.bam'),r'VCF/\1.raw.vcf.gz')
 def single_mpileup(input,output):
-    cmd = """/usr/local/samtools/samtools mpileup -uDSf /data/sedavis/public/sequences/ucsc/hg19/genome.fa %s | /usr/local/samtools/bcftools/bcftools view - > %s""" % (input,output)
-    return run_job(cmd)
+    cmd = """/usr/local/samtools/samtools mpileup -uDSf /data/sedavis/public/sequences/ucsc/hg19/genome.fa %s | /usr/local/samtools/bcftools/bcftools view -vcg - | /usr/local/tabix/bgzip > %s""" % (input,output)
+    return run_job(cmd,shell=True)
 
 @posttask(touch_file(os.path.join('log',fname3 + ".finished")))
 @follows(hs_metrics,insert_size_metrics,single_mpileup)
