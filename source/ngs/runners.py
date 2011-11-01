@@ -48,3 +48,13 @@ class JointSNVMix(object):
                                             param_file_name,
                                             output_file_name)
         return(cmd)
+
+class GATK(object):
+    def __init__(self,config):
+        self.jarfile=config['GATK']['jarfile']
+        self.reference=config['reference']
+        self.dbsnp=config['dbsnp']
+        
+    def UnifiedGenotyper(self,bamfiles,metricsfile,vcffile,other_args=None):
+        cmd = """java64 -Xmx2g -jar /usr/local/GATK/GenomeAnalysisTK.jar -T UnifiedGenotyper -R %s --dbsnp %s %s --metrics_file %s --out %s""" % (self.reference,self.dbsnp," ".join('-I '+ i for i in bamfiles),metricsfile,vcffile)
+        return(cmd)

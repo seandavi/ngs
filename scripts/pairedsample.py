@@ -63,4 +63,15 @@ def jsm_classify(input,output):
     cmd = jsm.classify(input[0],input[1],input[2],output)
     return run_job(cmd)
 
-pipeline_run([jsm_classify])
+@follows(index_normal_bam,index_tumor_bam)
+@files([opts.normalbam,opts.tumorbam],[opts.tumorbam.replace('.md.recal.realigned.bam','.snp_callability'),opts.tumorbam.replace('.md.recal.realigned.bam','.raw.vcf')])
+def unified_genotyper(input,output):
+    import ngs.runners
+    gatk = ngs.runners.GATK(config)
+    cmd = gatk.UnifiedGenotyper(bamfiles=input,
+                                metricsfile=output[0],
+                                vcffile=output[1],
+                                other_args=None)
+    return run_job(cmd)
+
+pipeline_run([unified_genotyper])
