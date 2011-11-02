@@ -65,7 +65,7 @@ def jsm_classify(input,output):
 
 @follows(index_normal_bam,index_tumor_bam)
 @files([opts.normalbam,opts.tumorbam],[opts.tumorbam.replace('.md.recal.realigned.bam','.snp_callability'),opts.tumorbam.replace('.md.recal.realigned.bam','.raw.vcf')])
-def unified_genotyper(input,output):
+def snp_unified_genotyper(input,output):
     import ngs.runners
     gatk = ngs.runners.GATK(config)
     cmd = gatk.UnifiedGenotyper(bamfiles=input,
@@ -74,4 +74,17 @@ def unified_genotyper(input,output):
                                 other_args=None)
     return run_job(cmd)
 
-pipeline_run([unified_genotyper])
+@follows(index_normal_bam,index_tumor_bam)
+@files([opts.normalbam,opts.tumorbam],[opts.tumorbam.replace('.md.recal.realigned.bam','.indel_callability'),opts.tumorbam.replace('.md.recal.realigned.bam','.raw.indel.vcf')])
+def indel_unified_genotyper(input,output):
+    import ngs.runners
+    gatk = ngs.runners.GATK(config)
+    cmd = gatk.UnifiedGenotyper(bamfiles=input,
+                                metricsfile=output[0],
+                                vcffile=output[1],
+                                other_args='--genotype_likelihoods_model INDEL')
+    return run_job(cmd)
+
+pipeline_run([snp_unified_genotyper,indel_unified_genotyper])
+#pipeline_printout_graph('flowchartpair.svg','svg',
+#                     [snp_unified_genotyper,indel_unified_genotyper])

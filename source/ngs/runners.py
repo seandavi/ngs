@@ -56,5 +56,7 @@ class GATK(object):
         self.dbsnp=config['dbsnp']
         
     def UnifiedGenotyper(self,bamfiles,metricsfile,vcffile,other_args=None):
-        cmd = """java64 -Xmx2g -jar /usr/local/GATK/GenomeAnalysisTK.jar -T UnifiedGenotyper -R %s --dbsnp %s %s --metrics_file %s --out %s""" % (self.reference,self.dbsnp," ".join('-I '+ i for i in bamfiles),metricsfile,vcffile)
+        if(other_args==None):
+            other_args=''
+        cmd = """java64 -Xmx2g -jar /usr/local/GATK/GenomeAnalysisTK.jar -T UnifiedGenotyper -R %s --dbsnp %s %s --metrics_file %s --out %s %s""" % (self.reference,self.dbsnp," ".join('-I '+ i for i in bamfiles),metricsfile,vcffile,other_args)
         return(cmd)
